@@ -10,11 +10,19 @@ const scene = new THREE.Scene();
 
 // Textures
 const texture = new THREE.TextureLoader().load('brick.jpg');
+const floorAlphaTexture = new THREE.TextureLoader().load('alphaFlare.png');
+
+// Wall
+const wallColorTexture = new THREE.TextureLoader().load('./textures/sandstone_blocks_04_diff_1k.jpg');
+const wallDisplacementTexture = new THREE.TextureLoader().load('./textures/sandstone_blocks_04_disp_1k.jpg');
+const wallRoughTexture = new THREE.TextureLoader().load('./textures/sandstone_blocks_04_rough_1k.jpg');
 const brickMaterial = new THREE.MeshBasicMaterial({ map: texture });
 
 const planeGeometry = new THREE.PlaneGeometry(10, 10);
 const material = new THREE.MeshBasicMaterial({
   color: "green",
+  alphaMap: floorAlphaTexture,
+  transparent: true,
   side: THREE.DoubleSide
 });
 
@@ -28,14 +36,27 @@ scene.add(church)
 
 const walls = new THREE.Mesh(
   new THREE.BoxGeometry(2, 2, 2),
-  new THREE.MeshStandardMaterial({ color: 'white' }),
+  new THREE.MeshStandardMaterial({ 
+    transparent: true,
+    map: wallColorTexture,
+    roughnessMap: wallRoughTexture,
+    displacementMap: wallDisplacementTexture,
+    displacementScale: 1,
+  }),
 );
 walls.position.y = 1;
 church.add(walls);
 
 const roof = new THREE.Mesh(
   new THREE.ConeGeometry(1.5, 3, 4),
-  new THREE.MeshStandardMaterial({ color: 'white' }),
+  new THREE.MeshStandardMaterial({ 
+    color: 'red',
+    transparent: true,
+    map: wallColorTexture,
+    roughnessMap: wallRoughTexture,
+    displacementMap: wallDisplacementTexture,
+    displacementScale: 1,
+  }),
 );
 roof.position.y = 3.4;
 roof.rotation.y = Math.PI / 4;
@@ -73,6 +94,10 @@ scene.add(camera);
 const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.z = 9;
 scene.add(light);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+light.position.z = 9;
+scene.add(ambientLight);
 
 const renderer = new THREE.WebGLRenderer({ 
   canvas: canvas,
